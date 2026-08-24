@@ -1,0 +1,86 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: ds-sap
+  datasource:
+    url: jdbc:h2:file:./data/dssap;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+logging:
+  threshold:
+    console: TRACE
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%logger{36}] %msg%n"
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.orm.jdbc.extract: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.type.descriptor.sql.BasicExtractor: TRACE
+    com.dssap: INFO
+
+sap:
+  # mock | jco | odata
+  client: mock
+  system-id: DS1
+  language: KO
+
+  jco:
+    ashost: 10.0.0.10
+    sysnr: "00"
+    client: "100"
+    user: SAP_USER
+    passwd: SAP_PASSWORD
+    lang: KO
+    pool-capacity: 5
+    peak-limit: 10
+    destination-name: DS_SAP
+
+  odata:
+    base-url: https://s4.example.com/sap/opu/odata/sap
+    username: SAP_USER
+    password: SAP_PASSWORD
+    sap-client: "100"
+
+  realtime:
+    timeout-ms: 10000
+    material-bapi: BAPI_MATERIAL_GET_DETAIL
+    sales-order-bapi: BAPI_SALESORDER_GETLIST
+
+  batch:
+    enabled: true
+    cron: "0 0 2 * * *"
+    chunk-size: 200
+    page-size: 500
+    function-name: RFC_READ_TABLE
+    table-name: MARA
+    fields:
+      - MATNR
+      - MTART
+      - MATKL
+      - MEINS
+      - ERSDA
+    where: ""
+    output-dir: ./data/batch-out

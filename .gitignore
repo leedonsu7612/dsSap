@@ -1,0 +1,14 @@
+target/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+*.log
+lib/sapjco3.jar
+lib/sapjco3.dll
+lib/*.so
+lib/*.dylib
+application-local.yml
+.env

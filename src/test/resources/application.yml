@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:dssap-test;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+sap:
+  client: mock
+  batch:
+    enabled: false
+    output-dir: ./target/batch-out
+    page-size: 2
+    chunk-size: 2
