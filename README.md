@@ -31,6 +31,7 @@ mvn spring-boot:run
 
 PowerShell이면 `.\run.bat` 또는 `.\mvnw.cmd spring-boot:run` 입니다.
 
+- UI (JSON → HTML 표): http://localhost:8888/
 - 실시간 자재: `GET http://localhost:8888/api/realtime/materials/10000001`
 - 실시간 수주: `GET http://localhost:8888/api/realtime/sales-orders/0000000001`
 - 임의 RFC: `POST http://localhost:8888/api/realtime/rfc/BAPI_MATERIAL_GET_DETAIL`  body `{"MATERIAL":"10000001"}`

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ds-sap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div class="bg"></div>
+  <main class="shell">
+    <header class="hero">
+      <p class="brand">ds-sap</p>
+      <h1>SAP 조회 결과</h1>
+      <p class="lede">API JSON을 파싱해 표로 보여줍니다.</p>
+      <p class="status" id="healthStatus">상태 확인 중…</p>
+    </header>
+
+    <section class="panel" aria-labelledby="realtime-title">
+      <div class="panel-head">
+        <h2 id="realtime-title">실시간</h2>
+        <p>요청 즉시 SAP(또는 mock)에서 조회합니다.</p>
+      </div>
+      <form id="realtimeForm" class="controls" autocomplete="off">
+        <label>
+          유형
+          <select id="realtimeType">
+            <option value="material">자재</option>
+            <option value="salesOrder">수주</option>
+          </select>
+        </label>
+        <label class="grow">
+          키
+          <input id="realtimeKey" type="text" value="10000001" spellcheck="false" />
+        </label>
+        <button type="submit">조회</button>
+      </form>
+      <div id="realtimeMeta" class="meta" hidden></div>
+      <div id="realtimeTable" class="table-wrap"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="batch-title">
+      <div class="panel-head">
+        <h2 id="batch-title">배치 적재</h2>
+        <p>DB에 저장된 payload JSON을 풀어 표로 표시합니다.</p>
+      </div>
+      <div class="controls">
+        <button type="button" id="batchRunBtn">배치 실행</button>
+        <button type="button" id="batchLoadBtn" class="ghost">적재 데이터 새로고침</button>
+      </div>
+      <div id="batchMeta" class="meta" hidden></div>
+      <div id="batchTable" class="table-wrap"></div>
+    </section>
+
+    <p id="errorBox" class="error" hidden></p>
+  </main>
+  <script src="/js/app.js"></script>
+</body>
+</html>
