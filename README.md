@@ -36,7 +36,9 @@ PowerShell이면 `.\run.bat` 또는 `.\mvnw.cmd spring-boot:run` 입니다.
 - 실시간 수주: `GET http://localhost:8888/api/realtime/sales-orders/0000000001`
 - 임의 RFC: `POST http://localhost:8888/api/realtime/rfc/BAPI_MATERIAL_GET_DETAIL`  body `{"MATERIAL":"10000001"}`
 - 배치 즉시 실행: `POST http://localhost:8888/api/batch/run`
-- 적재 결과: `GET http://localhost:8888/api/batch/records`
+- 적재 결과(MyBatis): `GET http://localhost:8888/api/mybatis/extracts?sourceTable=MARA&businessKey=10000001`
+- 적재 건수(MyBatis): `GET http://localhost:8888/api/mybatis/extracts/count`
+- 적재 결과(호환): `GET http://localhost:8888/api/batch/records`
 - 상태: `GET http://localhost:8888/api/health`
 - H2 콘솔: http://localhost:8888/h2-console  (JDBC URL `jdbc:h2:file:./data/dssap`)
 
@@ -134,7 +136,10 @@ src/main/java/com/dssap
   client/          SAP 접속 (mock / jco / odata)
   realtime/        요청 즉시 조회
   batch/           스케줄 대량 추출
+  mybatis/          MyBatis 매퍼 기반 적재 조회 (동적 SQL)
   config/          application.yml 매핑
+src/main/resources/mapper
+  SapExtractMapper.xml
 ```
 
 ## 두 방식 선택 기준

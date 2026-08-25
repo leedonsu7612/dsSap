@@ -1,6 +1,6 @@
 package com.dssap;
 
-import com.dssap.batch.SapExtractRepository;
+import com.dssap.mybatis.SapExtractMyBatisService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,7 +24,7 @@ class SapFlowIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private SapExtractRepository repository;
+    private SapExtractMyBatisService myBatisService;
 
     @Test
     void realtimeMaterial_returnsImmediately() throws Exception {
@@ -40,8 +40,13 @@ class SapFlowIntegrationTest {
         mockMvc.perform(post("/api/batch/run").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is("COMPLETED")))
-                .andExpect(jsonPath("$.writeCount", greaterThan(0)));
+                .andExpect(jsonPath("$.writeCount", greaterThan(0)))
+                .andExpect(jsonPath("$.access", is("mybatis")));
 
-        assertTrue(repository.count() >= 5);
+        assertTrue(myBatisService.countAll() >= 5);
+
+        mockMvc.perform(get("/api/mybatis/extracts").param("sourceTable", "MARA"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].sourceTable", is("MARA")));
     }
 }

@@ -1,11 +1,16 @@
 server:
   port: 8888
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   application:
     name: ds-sap
   datasource:
-    url: jdbc:h2:file:./data/dssap;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:./data/dssap;AUTO_SERVER=TRUE;MODE=LEGACY
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -28,6 +33,15 @@ spring:
     job:
       enabled: false
 
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.dssap.batch.entity,com.dssap.mybatis
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 30
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
 logging:
   threshold:
     console: TRACE
@@ -40,6 +54,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.hibernate.type.descriptor.sql.BasicExtractor: TRACE
     com.dssap: INFO
+    com.dssap.mybatis.mapper: DEBUG
 
 sap:
   # mock | jco | odata

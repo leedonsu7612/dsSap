@@ -2,6 +2,7 @@ package com.dssap.batch;
 
 import com.dssap.batch.entity.SapExtractEntity;
 import com.dssap.common.QueryLog;
+import com.dssap.mybatis.SapExtractMyBatisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -22,16 +23,16 @@ public class BatchJobController {
     private static final Logger log = LoggerFactory.getLogger(BatchJobController.class);
 
     private final SapExtractJobRunner jobRunner;
-    private final SapExtractRepository repository;
+    private final SapExtractMyBatisService myBatisService;
 
-    public BatchJobController(SapExtractJobRunner jobRunner, SapExtractRepository repository) {
+    public BatchJobController(SapExtractJobRunner jobRunner, SapExtractMyBatisService myBatisService) {
         this.jobRunner = jobRunner;
-        this.repository = repository;
+        this.myBatisService = myBatisService;
     }
 
     @PostMapping("/run")
     public ResponseEntity<Map<String, Object>> run() {
-        QueryLog.query(log, "배치 Job 실행", Map.of("jobName", SapExtractJobConfig.JOB_NAME, "trigger", "api"));
+        QueryLog.query(log, "Batch job run", Map.of("jobName", SapExtractJobConfig.JOB_NAME, "trigger", "api"));
         JobExecution execution = jobRunner.run("api");
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("status", execution.getStatus().toString());
@@ -39,16 +40,14 @@ public class BatchJobController {
         body.put("jobId", execution.getJobId());
         body.put("readCount", execution.getStepExecutions().stream().mapToLong(step -> step.getReadCount()).sum());
         body.put("writeCount", execution.getStepExecutions().stream().mapToLong(step -> step.getWriteCount()).sum());
-        body.put("storedCount", repository.count());
-        QueryLog.data(log, "배치 Job 실행 결과", body);
+        body.put("storedCount", myBatisService.countAll());
+        body.put("access", "mybatis");
+        QueryLog.data(log, "Batch job result", body);
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/records")
     public List<SapExtractEntity> recent() {
-        QueryLog.query(log, "적재 데이터 조회", "SELECT TOP 50 * FROM sap_extract ORDER BY extracted_at DESC");
-        List<SapExtractEntity> rows = repository.findTop50ByOrderByExtractedAtDesc();
-        QueryLog.data(log, "적재 데이터 조회 결과 (" + rows.size() + "건)", rows);
-        return rows;
+        return myBatisService.findRecent(50);
     }
 }

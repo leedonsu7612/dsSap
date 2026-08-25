@@ -12,10 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * 실시간 조회: 호출 즉시 SAP 에 동기 RFC/OData 를 날리고 결과를 그대로 반환한다.
- * 캐시·스케줄 없이 요청-응답 한 건이다.
- */
 @Service
 public class RealtimeSapService {
 
@@ -57,12 +53,12 @@ public class RealtimeSapService {
         query.put("mode", sapClient.mode());
         query.put("function", request.getFunctionName());
         query.put("params", request.getImports());
-        QueryLog.query(log, "실시간 SAP 조회", query);
+        QueryLog.query(log, "Realtime SAP call", query);
 
         SapResult result = sapClient.call(request);
         RealtimeResponse response = RealtimeResponse.from(sapClient.mode(), request.getFunctionName(), result);
-        log.info("실시간 SAP 조회 완료 elapsedMs={}", System.currentTimeMillis() - started);
-        QueryLog.data(log, "실시간 조회 결과", response);
+        log.info("Realtime SAP call done elapsedMs={}", System.currentTimeMillis() - started);
+        QueryLog.data(log, "Realtime result", response);
         return response;
     }
 }

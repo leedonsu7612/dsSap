@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dssap.mybatis.mapper.SapExtractMapper">
+
+    <resultMap id="SapExtractMap" type="com.dssap.batch.entity.SapExtractEntity">
+        <id property="id" column="id"/>
+        <result property="jobName" column="job_name"/>
+        <result property="sourceTable" column="source_table"/>
+        <result property="businessKey" column="business_key"/>
+        <result property="payloadJson" column="payload_json"/>
+        <result property="extractedAt" column="extracted_at"/>
+    </resultMap>
+
+    <sql id="baseColumns">
+        id, job_name, source_table, business_key, payload_json, extracted_at
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sap_extract (
+            job_name, source_table, business_key, payload_json, extracted_at
+        ) VALUES (
+            #{jobName}, #{sourceTable}, #{businessKey}, #{payloadJson}, #{extractedAt}
+        )
+    </insert>
+
+    <insert id="insertAll" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sap_extract (
+            job_name, source_table, business_key, payload_json, extracted_at
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.jobName}, #{item.sourceTable}, #{item.businessKey}, #{item.payloadJson}, #{item.extractedAt})
+        </foreach>
+    </insert>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM sap_extract
+    </select>
+
+    <select id="findRecent" resultMap="SapExtractMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM sap_extract
+        ORDER BY extracted_at DESC
+        FETCH FIRST #{limit} ROWS ONLY
+    </select>
+
+    <select id="findById" resultMap="SapExtractMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM sap_extract
+        WHERE id = #{id}
+    </select>
+
+    <!-- 동적 SQL: 조건이 있을 때만 WHERE 절에 추가 -->
+    <select id="search" resultMap="SapExtractMap">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM sap_extract
+        <where>
+            <if test="businessKey != null and businessKey != ''">
+                AND business_key = #{businessKey}
+            </if>
+            <if test="jobName != null and jobName != ''">
+                AND job_name = #{jobName}
+            </if>
+            <if test="sourceTable != null and sourceTable != ''">
+                AND source_table = #{sourceTable}
+            </if>
+        </where>
+        ORDER BY extracted_at DESC
+        FETCH FIRST #{limit} ROWS ONLY
+    </select>
+
+</mapper>

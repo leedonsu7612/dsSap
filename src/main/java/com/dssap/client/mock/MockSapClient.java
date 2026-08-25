@@ -15,17 +15,18 @@ import java.util.Map;
 
 /**
  * SAP 접속 없이 실시간/배치 흐름을 검증하기 위한 샘플 데이터.
+ * 한글 리터럴은 Windows 기본 인코딩(MS949) 컴파일 깨짐을 피하려고 Unicode escape 사용.
  */
 @Component
 @ConditionalOnProperty(name = "sap.client", havingValue = "mock", matchIfMissing = true)
 public class MockSapClient implements SapClient {
 
     private static final List<Map<String, Object>> MATERIALS = List.of(
-            material("10000001", "FERT", "완제품 A", "EA"),
-            material("10000002", "HALB", "반제품 B", "KG"),
-            material("10000003", "ROH", "원자재 C", "M"),
-            material("10000004", "FERT", "완제품 D", "EA"),
-            material("10000005", "HAWA", "상품 E", "EA")
+            material("10000001", "FERT", "\uC644\uC81C\uD488 A", "EA"),
+            material("10000002", "HALB", "\uBC18\uC81C\uD488 B", "KG"),
+            material("10000003", "ROH", "\uC6D0\uC790\uC7AC C", "M"),
+            material("10000004", "FERT", "\uC644\uC81C\uD488 D", "EA"),
+            material("10000005", "HAWA", "\uC0C1\uD488 E", "EA")
     );
 
     @Override
@@ -44,7 +45,11 @@ public class MockSapClient implements SapClient {
             Map<String, Object> found = MATERIALS.stream()
                     .filter(row -> String.valueOf(row.get("MATNR")).equals(String.valueOf(matnr)))
                     .findFirst()
-                    .orElseGet(() -> material(String.valueOf(matnr), "UNKN", "미등록 자재", "EA"));
+                    .orElseGet(() -> material(
+                            String.valueOf(matnr),
+                            "UNKN",
+                            "\uBBF8\uB4F1\uB85D \uC790\uC7AC",
+                            "EA"));
             result.putExport("MATERIAL_GENERAL_DATA", found);
             result.putTable("MATERIALDATA", List.of(found));
             return result;

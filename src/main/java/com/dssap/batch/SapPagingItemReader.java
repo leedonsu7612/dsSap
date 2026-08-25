@@ -14,9 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * SAP 테이블을 page-size 단위로 읽어 배치 청크에 공급한다.
- */
 public class SapPagingItemReader implements ItemStreamReader<Map<String, Object>> {
 
     private static final Logger log = LoggerFactory.getLogger(SapPagingItemReader.class);
@@ -39,7 +36,7 @@ public class SapPagingItemReader implements ItemStreamReader<Map<String, Object>
         this.skip = executionContext.containsKey(SKIP_KEY) ? executionContext.getInt(SKIP_KEY) : 0;
         this.lastPageLoaded = false;
         this.currentPage = Collections.emptyIterator();
-        log.info("배치 SAP 추출 시작 table={} skip={} pageSize={}", batch.getTableName(), skip, batch.getPageSize());
+        log.info("Batch SAP extract start table={} skip={} pageSize={}", batch.getTableName(), skip, batch.getPageSize());
     }
 
     @Override
@@ -55,7 +52,7 @@ public class SapPagingItemReader implements ItemStreamReader<Map<String, Object>
                     skip,
                     batch.getPageSize()
             );
-            QueryLog.query(log, "배치 SAP 페이지 조회", Map.of(
+            QueryLog.query(log, "Batch SAP page read", Map.of(
                     "table", batch.getTableName(),
                     "fields", batch.getFields(),
                     "where", batch.getWhere() == null ? "" : batch.getWhere(),
@@ -64,10 +61,10 @@ public class SapPagingItemReader implements ItemStreamReader<Map<String, Object>
             ));
             if (page == null || page.isEmpty()) {
                 lastPageLoaded = true;
-                log.info("[DATA] 배치 페이지 결과 없음 skip={}", skip);
+                log.info("[DATA] Batch page empty skip={}", skip);
                 return null;
             }
-            QueryLog.data(log, "배치 페이지 조회 결과 (" + page.size() + "건)", page);
+            QueryLog.data(log, "Batch page result (" + page.size() + " rows)", page);
             skip += page.size();
             if (page.size() < batch.getPageSize()) {
                 lastPageLoaded = true;

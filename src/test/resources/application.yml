@@ -12,6 +12,12 @@ spring:
     job:
       enabled: false
 
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.dssap.batch.entity,com.dssap.mybatis
+  configuration:
+    map-underscore-to-camel-case: true
+
 sap:
   client: mock
   batch:

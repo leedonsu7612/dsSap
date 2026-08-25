@@ -3,6 +3,7 @@ package com.dssap.batch;
 import com.dssap.batch.entity.SapExtractEntity;
 import com.dssap.client.SapClient;
 import com.dssap.config.SapProperties;
+import com.dssap.mybatis.SapExtractMyBatisService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -49,14 +50,14 @@ public class SapExtractJobConfig {
                                PlatformTransactionManager transactionManager,
                                SapClient sapClient,
                                SapProperties sapProperties,
-                               SapExtractRepository repository,
+                               SapExtractMyBatisService myBatisService,
                                ObjectMapper objectMapper) {
         SapProperties.Batch batch = sapProperties.getBatch();
         return new StepBuilder("sapExtractStep", jobRepository)
                 .<Map<String, Object>, SapExtractEntity>chunk(batch.getChunkSize(), transactionManager)
                 .reader(new SapPagingItemReader(sapClient, batch))
                 .processor(new SapExtractProcessor(batch, objectMapper, JOB_NAME))
-                .writer(new SapExtractItemWriter(repository, batch))
+                .writer(new SapExtractItemWriter(myBatisService, batch))
                 .build();
     }
 }

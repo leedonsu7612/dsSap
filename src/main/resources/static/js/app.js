@@ -7,6 +7,10 @@
   const realtimeTable = document.getElementById("realtimeTable");
   const batchRunBtn = document.getElementById("batchRunBtn");
   const batchLoadBtn = document.getElementById("batchLoadBtn");
+  const mybatisForm = document.getElementById("mybatisForm");
+  const mbBusinessKey = document.getElementById("mbBusinessKey");
+  const mbJobName = document.getElementById("mbJobName");
+  const mbSourceTable = document.getElementById("mbSourceTable");
   const batchMeta = document.getElementById("batchMeta");
   const batchTable = document.getElementById("batchTable");
   const errorBox = document.getElementById("errorBox");
@@ -142,23 +146,48 @@
     }
   }
 
+  function toTableRows(records) {
+    return (records || []).map((item) => {
+      const payload = parsePayload(item.payloadJson);
+      return {
+        id: item.id,
+        businessKey: item.businessKey,
+        sourceTable: item.sourceTable,
+        jobName: item.jobName,
+        extractedAt: item.extractedAt,
+        ...payload,
+      };
+    });
+  }
+
   async function loadBatchRecords() {
     showError("");
     try {
-      const records = await fetchJson("/api/batch/records");
-      const rows = (records || []).map((item) => {
-        const payload = parsePayload(item.payloadJson);
-        return {
-          id: item.id,
-          businessKey: item.businessKey,
-          sourceTable: item.sourceTable,
-          jobName: item.jobName,
-          extractedAt: item.extractedAt,
-          ...payload,
-        };
-      });
+      const records = await fetchJson("/api/mybatis/extracts?limit=50");
+      const rows = toTableRows(records);
       batchMeta.hidden = false;
-      batchMeta.textContent = `적재 ${rows.length}건 · payloadJson 파싱 완료`;
+      batchMeta.textContent = `MyBatis 조회 ${rows.length}건 · payloadJson 파싱 완료`;
+      renderTable(batchTable, rows);
+    } catch (e) {
+      batchMeta.hidden = true;
+      batchTable.innerHTML = "";
+      showError(e.message);
+    }
+  }
+
+  async function searchMyBatis(event) {
+    event.preventDefault();
+    showError("");
+    const params = new URLSearchParams();
+    if (mbBusinessKey.value.trim()) params.set("businessKey", mbBusinessKey.value.trim());
+    if (mbJobName.value.trim()) params.set("jobName", mbJobName.value.trim());
+    if (mbSourceTable.value.trim()) params.set("sourceTable", mbSourceTable.value.trim());
+    params.set("limit", "50");
+    try {
+      const records = await fetchJson(`/api/mybatis/extracts?${params.toString()}`);
+      const rows = toTableRows(records);
+      batchMeta.hidden = false;
+      batchMeta.textContent = `MyBatis 동적 SQL ${rows.length}건 · ${params.toString() || "조건 없음"}`;
       renderTable(batchTable, rows);
     } catch (e) {
       batchMeta.hidden = true;
@@ -173,7 +202,7 @@
     try {
       const result = await fetchJson("/api/batch/run", { method: "POST" });
       batchMeta.hidden = false;
-      batchMeta.textContent = `status=${result.status} · read=${result.readCount} · write=${result.writeCount} · stored=${result.storedCount}`;
+      batchMeta.textContent = `status=${result.status} · read=${result.readCount} · write=${result.writeCount} · stored=${result.storedCount} · access=${result.access}`;
       await loadBatchRecords();
     } catch (e) {
       showError(e.message);
@@ -189,6 +218,7 @@
   realtimeForm.addEventListener("submit", loadRealtime);
   batchRunBtn.addEventListener("click", runBatch);
   batchLoadBtn.addEventListener("click", loadBatchRecords);
+  mybatisForm.addEventListener("submit", searchMyBatis);
 
   loadHealth();
   loadRealtime({ preventDefault() {} });

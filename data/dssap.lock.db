@@ -1,6 +1,6 @@
 #FileLock
-#Mon Aug 24 21:05:27 KST 2026
+#Tue Aug 25 16:33:18 KST 2026
 hostName=DESKTOP-E4JGP7M
-id=1a033a928d3bd045fe9d283af1b6a57d405d221dab6
+id=1a037d65e93a10cd0979b89177d4d4310bcef843a6e
 method=file
-server=172.27.192.1\:64509
+server=172.27.192.1\:58064
