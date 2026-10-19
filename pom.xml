@@ -15,6 +15,7 @@
     <artifactId>ds-sap</artifactId>
     <version>1.0.0</version>
     <name>ds-sap</name>
+    <packaging>war</packaging> <!-- WAR 패키징 설정 -->
     <description>SAP 실시간 조회와 배치 추출</description>
 
     <properties>
